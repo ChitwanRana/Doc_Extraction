@@ -1,0 +1,4 @@
+myenv/
+.env
+uploaded_file/
+extracted_data/
