@@ -7,3 +7,5 @@ pillow==11.2.1
 pydantic==2.11.3
 unstructured==0.17.2
 matplotlib==3.10.1
+langchain-openai
+langchain-huggingface

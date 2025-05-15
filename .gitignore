@@ -2,3 +2,5 @@ myenv/
 .env
 uploaded_file/
 extracted_data/
+env1/
+__pycache__/
