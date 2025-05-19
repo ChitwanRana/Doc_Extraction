@@ -2,17 +2,125 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Extract Tables from PDF</title>
+    <title>PDF Table Extractor</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2rem; }
-        textarea { width: 100%; height: 300px; margin-bottom: 1rem; }
-        .csv-links li { margin-bottom: 0.5rem; }
-        .error { color: red; }
-        .success { color: green; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        form {
+            margin-bottom: 40px;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .table-entry {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            position: relative;
+        }
+
+        .tooltip {
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            color: #000000;
+            text-align: left;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+
+        .csv-link {
+            margin-left: 10px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .csv-link:hover {
+            text-decoration: underline;
+        }
+
+        .image-preview {
+            max-width: 250px;
+            max-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .images-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section {
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
+<div class="container">
     <h1>Upload PDF and Extract Tables</h1>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
@@ -20,20 +128,33 @@
     </form>
 
     {% if extracted_texts %}
-        <h2>Extracted Table Data</h2>
-        {% for table in extracted_texts %}
-            <h3>Table {{ table.index }}</h3>
-            <textarea readonly>{{ table.content }}</textarea>
-        {% endfor %}
+        <div class="section">
+            <h2>Extracted Table Data</h2>
+            {% for table in extracted_texts %}
+                <div class="table-entry">
+                    <span class="tooltip">Table {{ table.index }}
+                        <span class="tooltiptext">{{ table.content }}</span>
+                    </span>
+                    {% for csv in csv_paths %}
+                        {% if csv.index == table.index %}
+                            <a href="{{ csv.url }}" class="csv-link" download>Download CSV</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 
-    {% if csv_paths %}
-        <h2>Download CSVs</h2>
-        <ul class="csv-links">
-            {% for csv in csv_paths %}
-                <li><a href="{{ csv.url }}">Download Table {{ csv.index }}</a></li>
-            {% endfor %}
-        </ul>
+    {% if image_urls %}
+        <div class="section">
+            <h2>Extracted Images</h2>
+            <div class="images-wrapper">
+                {% for image in image_urls %}
+                    <img src="{{ image }}" alt="Extracted Image" class="image-preview">
+                {% endfor %}
+            </div>
+        </div>
     {% endif %}
+</div>
 </body>
 </html>
