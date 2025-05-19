@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Extract Tables from PDF</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        textarea { width: 100%; height: 300px; margin-bottom: 1rem; }
+        .csv-links li { margin-bottom: 0.5rem; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Upload PDF and Extract Tables</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if extracted_texts %}
+        <h2>Extracted Table Data</h2>
+        {% for table in extracted_texts %}
+            <h3>Table {{ table.index }}</h3>
+            <textarea readonly>{{ table.content }}</textarea>
+        {% endfor %}
+    {% endif %}
+
+    {% if csv_paths %}
+        <h2>Download CSVs</h2>
+        <ul class="csv-links">
+            {% for csv in csv_paths %}
+                <li><a href="{{ csv.url }}">Download Table {{ csv.index }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
